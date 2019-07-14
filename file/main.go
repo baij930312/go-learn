@@ -2,18 +2,14 @@ package main
 
 import (
 	"fmt"
-	"os"
-	"bufio"
+	"io/ioutil"
 )
 
-func main (){
-	file ,err := os.OpenFile("./temp.txt", os.O_WRONLY | os.O_CREATE,0666)
+func main() {
+	fileContent, err := ioutil.ReadFile("./temp.txt")
 	if err != nil {
 		fmt.Println(err)
 	}
-	defer file.Close()
-	wr := bufio.NewWriter(file);
-	wr.WriteString("123123")
-	//刷新缓冲区
-	wr.Flush()
+
+	fmt.Println(string(fileContent))
 }
