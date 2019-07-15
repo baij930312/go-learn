@@ -2,14 +2,24 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
+	// "io/ioutil"
+	"os"
 )
 
 func main() {
-	fileContent, err := ioutil.ReadFile("./temp.txt")
-	if err != nil {
-		fmt.Println(err)
+	exisit, _ := PathExisists("./temp.go")
+	fmt.Println(exisit)
+}
+
+func PathExisists(path string) (bool, error) {
+	_, error := os.Stat(path)
+	if error != nil {
+		return true, nil
 	}
 
-	fmt.Println(string(fileContent))
+	if os.IsNotExist(error) {
+		return false, nil
+	}
+
+	return false, error
 }
