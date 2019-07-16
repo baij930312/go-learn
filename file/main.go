@@ -5,14 +5,19 @@ import (
 	"fmt"
 )
 
+type Monster struct{
+	Name string `json:"name"`
+	Age int `json:"age"`
+	Gender string `json:"gender"`
+}
+
 func main() {
-	var slice []map[string]interface{}
-	var m1 map[string]interface{}
-	m1 = make(map[string]interface{})
-	m1["hahaha"] = "asdasd"
-	m1["1111"] = "aaaa"
-	slice = append(slice, m1)
-	content, err := json.Marshal(slice)
+	m := Monster{
+		Name:"123213",
+		Age:12,
+		Gender:"12",
+	}
+	content, err := json.Marshal(m)
 	if err == nil {
 		fmt.Println(string(content))
 	}else{
