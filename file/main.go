@@ -2,22 +2,41 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
+	"io/ioutil"
 )
 
-type Monster struct{
-	Name string `json:"name"`
-	Age int `json:"age"`
-	Gender string `json:"gender"`
+type Monster struct {
+	Name  string `json:"name"`
+	Age   int    `json:"age"`
+	Skill string `json:"skill"`
 }
 
-func main() {
-	rowJson := `{"name":"123123123213","age":12,"gender":"12"}`
-	m := Monster{}
-	err := json.Unmarshal([]byte(rowJson),&m)
-	if err == nil {
-		fmt.Println(m)
-	}else{
-		fmt.Println(err)
+func (this *Monster) Store() bool {
+	content, err := json.Marshal(this)
+	if err != nil {
+		return false
 	}
+	err = ioutil.WriteFile("./Monster.txt", content, 0666)
+	if err != nil {
+		return false
+	}
+	return true
+}
+
+// "./Monster.txt"
+func (this *Monster) ReStore(path string) bool {
+	content,err := ioutil.ReadFile(path)
+	if err != nil {
+		return false
+	}
+	err = json.Unmarshal(content,this)
+	if err != nil {
+		return false
+	}
+	return true
+}
+
+
+func main()  {
+	
 }
