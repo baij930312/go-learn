@@ -12,14 +12,11 @@ type Monster struct{
 }
 
 func main() {
-	m := Monster{
-		Name:"123213",
-		Age:12,
-		Gender:"12",
-	}
-	content, err := json.Marshal(m)
+	rowJson := `{"name":"123123123213","age":12,"gender":"12"}`
+	m := Monster{}
+	err := json.Unmarshal([]byte(rowJson),&m)
 	if err == nil {
-		fmt.Println(string(content))
+		fmt.Println(m)
 	}else{
 		fmt.Println(err)
 	}
