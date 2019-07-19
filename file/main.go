@@ -32,7 +32,7 @@ func main() {
 		for i := 0; i < 8000; i++ {
 			source <- i
 		}
-		// close(source)
+		close(source)
 	}()
 
 	for i := 0; i < 4; i++ {
