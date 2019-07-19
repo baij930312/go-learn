@@ -5,24 +5,17 @@ import (
 	"reflect"
 )
 
-//Person Person
-type Person struct {
-	Name string
-	Age  int
+func test(a interface{}) {
+	aV := reflect.ValueOf(a)
+	fmt.Println(aV)
+	aV.Elem().SetInt(1111)
+	fmt.Println(aV)
 }
 
 func main() {
 	i := 1
-	refI := reflect.ValueOf(i)
-	reftype := reflect.TypeOf(i)
+	test(&i)
 
-	fmt.Println(refI.Kind())
-	fmt.Println(reftype)
-	fmt.Println(refI.Int())
-
-	var p = Person{"asd", 1}
-	iV := reflect.ValueOf(p)
-	fmt.Println(iV.Kind()) //struct
-	fmt.Println(iV.Type()) //main.Person
+	fmt.Println(i)
 
 }
