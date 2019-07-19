@@ -2,24 +2,27 @@ package main
 
 import (
 	"fmt"
-	"time"
+	"reflect"
 )
 
-func test() {
-
-	defer func() {
-		if err := recover(); err != nil {
-			fmt.Println(err)
-		}
-	}()
-	panic("asdsa")
-	// var m map[string]int
-	// m["123"] = 1
+//Person Person
+type Person struct {
+	Name string
+	Age  int
 }
 
 func main() {
-	go test()
+	i := 1
+	refI := reflect.ValueOf(i)
+	reftype := reflect.TypeOf(i)
 
-	time.Sleep(time.Second)
+	fmt.Println(refI.Kind())
+	fmt.Println(reftype)
+	fmt.Println(refI.Int())
+
+	var p = Person{"asd", 1}
+	iV := reflect.ValueOf(p)
+	fmt.Println(iV.Kind()) //struct
+	fmt.Println(iV.Type()) //main.Person
 
 }
