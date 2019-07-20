@@ -46,14 +46,22 @@ func runUpdate(path string, config Config) {
 	if err != nil {
 		return
 	}
-
+	//删除需要共享的项目的key
 	if v := m["dependencies"].(map[string]interface{}); v != nil {
 		for _, key := range config.InvalidPackageNames {
-			delete(scene, key)
+			delete(v, key)
 		}
 		fmt.Println(v)
 	}
+	file, err := json.Marshal(m)
+	if err != nil {
+		return
+	}
 
+	err = ioutil.WriteFile("./package.json", file, 0666)
+	if err != nil {
+		return
+	}
 	// result, execErr := execShell("yarn install")
 	// if execErr != nil {
 	// 	fmt.Println("执行错误", execErr)
