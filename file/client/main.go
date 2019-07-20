@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"strings"
 )
 
 func main() {
@@ -13,12 +14,17 @@ func main() {
 		fmt.Println(err)
 		return
 	}
+	reader := bufio.NewReader(os.Stdin)
 	for {
-		reader := bufio.NewReader(os.Stdin)
 		line, err := reader.ReadString('\n')
 		if err != nil {
 			fmt.Println(err)
 			return
+		}
+		line = strings.Trim(line, "\n")
+		if line == "exit" {
+			fmt.Println("退出成功")
+			break
 		}
 		n, err := conn.Write([]byte(line))
 		if err != nil {
