@@ -14,7 +14,8 @@ import (
 //Config Config
 type Config struct {
 	Projects        []string `json:"projects"`
-	TargetPackages  []string `json:"targetPackages"`
+	InjectPackages  []string `json:"injectPackages"`
+	TargetName      string   `json:"targetName"`
 	ScriptsForBegin []string `json:"scriptsForBegin"`
 	ScriptsForEnd   []string `json:"scriptsForEnd"`
 }
@@ -61,31 +62,43 @@ func runUpdate(path string, config Config) {
 	}
 	str := string(rawPackgeJson)
 	strArr := strings.Split(str, "\n")
-	//查找到目标报名的行 删除之
-	for _, key := range config.TargetPackages {
-		for i, v := range strArr {
-			if strings.Index(v, key) != -1 {
-				strArr = append(strArr[:i], strArr[i+1:]...)
-				break
-			}
+	//查找到目标行  插入需要更新的包
+	for i, v := range strArr {
+		//找到插入行 插入InjectPackages
+		if strings.Index(v, config.TargetName) != -1 {
+			rear := append(config.InjectPackages, strArr[i+1:]...)
+			strArr = append(strArr[0:i+1], rear...)
+			break
 		}
 	}
-	//删除后的package.json 内容
+
+	//更新后的package.json 内容
 	finalPackgeJson := strings.Join(strArr, "\n")
-	//写入文件
-	err = ioutil.WriteFile("./package.json", []byte(finalPackgeJson), 0666)
-	if err != nil {
-		fmt.Println("write file err .path :", path, err)
-		return
-	}
-	fmt.Println("refactor file  success")
-	//文件处理完成开始脚本执行
+
+	//更新node module
 	_, execErr := execShell("yarn install")
 	if execErr != nil {
 		fmt.Println("first yarn install err . path", path, execErr)
 		return
 	}
 	fmt.Println("first yarn install success")
+
+	//更改./package.json
+	err = ioutil.WriteFile("./package.json", []byte(finalPackgeJson), 0666)
+	if err != nil {
+		fmt.Println("write file err .path :", path, err)
+		return
+	}
+	fmt.Println("refactor file  success")
+
+	//再次执行yarn install 下载最新的inject的包
+	_, execErr = execShell("yarn install")
+	if execErr != nil {
+		fmt.Println("second yarn install err . path", path, execErr)
+		return
+	}
+	fmt.Println("second yarn install success")
+
 	//恢复package.json
 	_, execErr = execShell("git checkout package.json")
 	if execErr != nil {
@@ -93,12 +106,6 @@ func runUpdate(path string, config Config) {
 		return
 	}
 	fmt.Println("recover package.json success")
-	//再次执行yarn install 下载最新的target 包
-	_, execErr = execShell("yarn install")
-	if execErr != nil {
-		fmt.Println("second yarn install err . path", path, execErr)
-	}
-	fmt.Println("second yarn install success")
 
 	//target包已经完成更新 然后执行config中的script
 	for _, script := range config.ScriptsForEnd {
@@ -141,6 +148,5 @@ func execShell(s string) (string, error) {
 func checkErr(err error) {
 	if err != nil {
 		fmt.Println(err)
-
 	}
 }

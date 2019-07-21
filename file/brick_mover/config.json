@@ -1,8 +1,13 @@
 {
-  "projects": [""],
-  "targetPackages": ["moment"],
+  "projects": [],
+  "targetName": "dependencies",
+  "injectPackages": ["\"moment\":\"^2.24.0\","],
   "scriptsForBegin": ["git checkout master", "git pull origin master"],
   "scriptsForEnd": [
+    "yarn move",
+    "git add *",
+    "git commit -m \"update common package\"",
+    "git push",
     "git checkout dev",
     "git pull origin dev",
     "git merge master",
