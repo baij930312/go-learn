@@ -1,0 +1,14 @@
+{
+  "projects": [],
+  "scripts": [
+    "yarn move",
+    "git add *",
+    "git commit -m \"update common package\"",
+    "git push",
+    "git checkout dev",
+    "git pull origin dev",
+    "git merge master",
+    "git push",
+    "git checkout master"
+  ]
+}
