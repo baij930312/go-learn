@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/binary"
 	"fmt"
 	"net"
 )
@@ -9,12 +10,13 @@ func run(conn net.Conn) {
 	defer conn.Close()
 	for {
 		buf := make([]byte, 1024)
-		lenght, err := conn.Read(buf)
-		if err != nil {
-			fmt.Printf("客户端退出 err=%v", err)
+		length, err := conn.Read(buf)
+		if length != 4 || err != nil {
+			fmt.Printf("读取没有成功 err=%v", err)
 			return //!!!
 		}
-		fmt.Println(string(buf[:lenght]))
+
+		fmt.Println(binary.BigEndian.Uint32(buf[:length]))
 	}
 }
 
