@@ -26,12 +26,8 @@ func main() {
 			fmt.Scanf("%s\n", &account)
 			fmt.Println("password:")
 			fmt.Scanf("%s\n", &password)
-			err := login(account, password)
-			if err != nil {
-				fmt.Println("登录失败")
-			} else {
-				fmt.Println("登录成功")
-			}
+			login(account, password)
+
 			loop = false
 		case 2:
 			fmt.Println("注册用户")
@@ -44,5 +40,4 @@ func main() {
 			fmt.Println("输入有误请重新输入")
 		}
 	}
-
 }

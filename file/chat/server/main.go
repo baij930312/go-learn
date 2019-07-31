@@ -1,22 +1,87 @@
 package main
 
 import (
-	"encoding/binary"
+	"encoding/json"
 	"fmt"
+	"io"
 	"net"
+
+	"go_code/learn/file/chat/common/message"
+	"go_code/learn/file/chat/common/util"
 )
+
+func serverProcMesLogin(conn net.Conn, msg message.Message) error {
+	data := msg.Data
+	var loginMes message.LoginMes
+	var resMsg message.Message
+	var loginRes message.LoginResMes
+	resMsg.Type = message.LoginResMesType
+
+	err := json.Unmarshal([]byte(data), &loginMes)
+	if err != nil {
+		fmt.Println("json.Unmarshal", err)
+		return err
+	}
+	if loginMes.UserId == "100" && loginMes.Password == "123456" {
+		loginRes.Code = 200
+		data, err := json.Marshal(loginRes)
+		if err != nil {
+			fmt.Println("json.Marshal", err)
+			return err
+
+		}
+		resMsg.Data = string(data)
+
+		data, err = json.Marshal(resMsg)
+		if err != nil {
+			fmt.Println("json.Marshal", err)
+			return err
+
+		}
+		util.WritePkg(conn, data)
+	} else {
+		loginRes.Code = 500
+		data, err := json.Marshal(loginRes)
+		if err != nil {
+			fmt.Println("json.Marshal", err)
+			return err
+
+		}
+		resMsg.Data = string(data)
+
+		data, err = json.Marshal(resMsg)
+		if err != nil {
+			fmt.Println("json.Marshal", err)
+			return err
+
+		}
+		util.WritePkg(conn, data)
+	}
+	return nil
+}
+
+func serverProcMes(conn net.Conn, msg message.Message) {
+	switch msg.Type {
+	case message.LoginMesType:
+		serverProcMesLogin(conn, msg)
+	case message.LoginResMesType:
+
+	}
+}
 
 func run(conn net.Conn) {
 	defer conn.Close()
 	for {
-		buf := make([]byte, 1024)
-		length, err := conn.Read(buf)
-		if length != 4 || err != nil {
-			fmt.Printf("读取没有成功 err=%v", err)
-			return //!!!
+		msg, err := util.ReadPkg(conn)
+		if err != nil {
+			fmt.Printf("read pkg  err=%v", err)
+			if err == io.EOF {
+				fmt.Println("客户端关闭", err)
+				break
+			}
 		}
 
-		fmt.Println(binary.BigEndian.Uint32(buf[:length]))
+		serverProcMes(conn, msg)
 	}
 }
 
