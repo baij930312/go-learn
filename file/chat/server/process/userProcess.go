@@ -6,6 +6,7 @@ import (
 	"net"
 
 	"go_code/learn/file/chat/common/message"
+	"go_code/learn/file/chat/server/model"
 	"go_code/learn/file/chat/server/utils"
 )
 
@@ -15,6 +16,7 @@ type UserProcess struct {
 
 func (this *UserProcess) ServerProcMesLogin(msg message.Message) error {
 	data := msg.Data
+	fmt.Println(msg)
 	var loginMes message.LoginMes
 	var resMsg message.Message
 	var loginRes message.LoginResMes
@@ -28,7 +30,9 @@ func (this *UserProcess) ServerProcMesLogin(msg message.Message) error {
 	tf := &utils.Transfer{
 		Conn: this.Conn,
 	}
-	if loginMes.UserId == "100" && loginMes.Password == "123456" {
+	user, err := model.UserDaoInstance.Login(loginMes.UserId, loginMes.Password)
+	if err == nil {
+		fmt.Println(user)
 		loginRes.Code = 200
 		data, err := json.Marshal(loginRes)
 		if err != nil {
@@ -37,8 +41,8 @@ func (this *UserProcess) ServerProcMesLogin(msg message.Message) error {
 
 		}
 		resMsg.Data = string(data)
-
 		data, err = json.Marshal(resMsg)
+
 		if err != nil {
 			fmt.Println("json.Marshal", err)
 			return err
@@ -47,6 +51,15 @@ func (this *UserProcess) ServerProcMesLogin(msg message.Message) error {
 		tf.WritePkg(data)
 	} else {
 		loginRes.Code = 500
+		if err == model.ERROR_USER_NOT_EXEISTS {
+			loginRes.Code = 501
+			loginRes.Error = "用户不存在"
+		}
+		if err == model.ERROR_USER_PWD {
+			loginRes.Code = 502
+			loginRes.Error = "密码不匹配"
+		}
+		
 		data, err := json.Marshal(loginRes)
 		if err != nil {
 			fmt.Println("json.Marshal", err)

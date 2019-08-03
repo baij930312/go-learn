@@ -11,7 +11,7 @@ type Message struct{
 }
 
 type LoginMes struct{
-	UserId string  `json:"userId"`
+	UserId int  `json:"userId"`
 	Password string  `json:"password"`
 	UserName string  `json:"userName"`
 }
