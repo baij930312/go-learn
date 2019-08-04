@@ -11,21 +11,23 @@ import (
 
 func ShowMenu() {
 	var key int
+	var content string
 
 	fmt.Println("------------------登陆成功------------------")
 	fmt.Println("\t\t 1 显示在线用户列表")
 	fmt.Println("\t\t 2 发送信息")
 	fmt.Println("\t\t 3 信息列表")
 	fmt.Println("\t\t 推出系统 ")
-
+	sms := &SmsProcess{}
 	fmt.Scanf("%d\n", &key)
 	switch key {
 	case 1:
 		OutPutOnlineUsers()
 
 	case 2:
-		fmt.Println("发送信息")
-
+		fmt.Println("请讲")
+		fmt.Scanf("%s\n", &content)
+		sms.SendGroup(content)
 	case 3:
 		fmt.Println("信息列表")
 	case 4:
@@ -55,7 +57,9 @@ func serverProcessSms(conn net.Conn) {
 				fmt.Println(" json.Unmarshal")
 			}
 			updateUserStatus(&notifMes)
-
+		case message.SmsMesType:
+			smsProcess := &SmsProcess{}
+			smsProcess.ReceiveSms(msg)
 		default:
 			fmt.Println("收到消息")
 		}

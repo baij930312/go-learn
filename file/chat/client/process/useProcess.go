@@ -70,6 +70,10 @@ func (this *UserProcess) Login(account int, password string) error {
 			}
 			OnlineUsers[v] = user
 		}
+		CurrentUser.Conn = conn
+		CurrentUser.UserId = account
+		CurrentUser.Status = message.UserOnline
+
 		go serverProcessSms(conn)
 		for {
 			ShowMenu()

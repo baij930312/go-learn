@@ -51,6 +51,13 @@ func (this *Processer) ServerProcMes(msg message.Message) error {
 		if err != nil {
 			return err
 		}
+	case message.SmsMesType:
+		smsProcess := &SmsProcess{}
+		err := smsProcess.SendGroup(msg)
+		if err != nil {
+			return err
+		}
 	}
+
 	return nil
 }
