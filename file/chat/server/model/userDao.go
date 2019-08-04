@@ -55,3 +55,27 @@ func (this *UserDao) Login(userId int, userPwd string) (user *User, err error) {
 	}
 	return
 }
+
+func (this *UserDao) Register(userId int, userPwd string, userName string) (user *User, err error) {
+	conn := this.pool.Get()
+	defer conn.Close()
+	_, err = this.getUserById(conn, userId)
+	if err == nil {
+		err = ERROR_USER_EXEISTS
+		fmt.Println("用户已存在 ", err)
+		return
+	}
+	u := &User{
+		UserId:   userId,
+		Password: userPwd,
+		UserName: userName,
+	}
+	data, err := json.Marshal(u)
+	_, err = conn.Do("hset", "users", userId, string(data))
+	if err != nil {
+		fmt.Println("创建user失败 ", err)
+		return
+	}
+
+	return
+}

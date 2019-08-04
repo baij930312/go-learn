@@ -43,8 +43,14 @@ func (this *Processer) ServerProcMes(msg message.Message) error {
 		if err != nil {
 			return err
 		}
-	case message.LoginResMesType:
-
+	case message.RegisterMesType:
+		userProcess := &UserProcess{
+			Conn: this.Conn,
+		}
+		err := userProcess.ServerProcMesRegister(msg)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }

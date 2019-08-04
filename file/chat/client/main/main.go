@@ -9,6 +9,7 @@ import (
 
 var account int
 var password string
+var userName string
 
 func main() {
 	var key int
@@ -33,6 +34,15 @@ func main() {
 
 		case 2:
 			fmt.Println("注册用户")
+			fmt.Println("account:")
+			fmt.Scanf("%d\n", &account)
+			fmt.Println("password:")
+			fmt.Scanf("%s\n", &password)
+			fmt.Println("username:")
+			fmt.Scanf("%s\n", &userName)
+			up := process.UserProcess{}
+			up.Register(account, password, userName)
+
 		case 3:
 			fmt.Println("退出")
 			os.Exit(0)
