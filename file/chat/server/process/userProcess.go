@@ -11,7 +11,8 @@ import (
 )
 
 type UserProcess struct {
-	Conn net.Conn
+	Conn   net.Conn
+	userId int
 }
 
 func (this *UserProcess) ServerProcMesLogin(msg message.Message) error {
@@ -33,6 +34,16 @@ func (this *UserProcess) ServerProcMesLogin(msg message.Message) error {
 	user, err := model.UserDaoInstance.Login(loginMes.UserId, loginMes.Password)
 	if err == nil {
 		fmt.Println(user)
+		this.userId = user.UserId
+		userManagerInstance.AddOnlineUser(this)
+		this.NotifyOtherOnlineUser(user.UserId)
+		onlinUsers := make([]int, 0)
+		for k, _ := range userManagerInstance.onlineUsers {
+			onlinUsers = append(onlinUsers, k)
+		}
+
+		onlineUsersData, err := json.Marshal(onlinUsers)
+		loginRes.Data = string(onlineUsersData)
 		loginRes.Code = 200
 		data, err := json.Marshal(loginRes)
 		if err != nil {
@@ -41,13 +52,14 @@ func (this *UserProcess) ServerProcMesLogin(msg message.Message) error {
 
 		}
 		resMsg.Data = string(data)
+
 		data, err = json.Marshal(resMsg)
 
 		if err != nil {
 			fmt.Println("json.Marshal", err)
 			return err
-
 		}
+
 		tf.WritePkg(data)
 	} else {
 		loginRes.Code = 500
@@ -141,5 +153,41 @@ func (this *UserProcess) ServerProcMesRegister(msg message.Message) error {
 		}
 		tf.WritePkg(data)
 	}
+	return nil
+}
+
+func (this *UserProcess) NotifyOtherOnlineUser(userId int) error {
+	for id, up := range userManagerInstance.onlineUsers {
+		if id == userId {
+			continue
+		}
+		up.NotifyOtherOnline(userId)
+	}
+	return nil
+}
+
+func (this *UserProcess) NotifyOtherOnline(userId int) error {
+	tf := &utils.Transfer{
+		Conn: this.Conn,
+	}
+	var resMsg message.Message
+	resMsg.Type = message.NotifyUserStatusMesType
+
+	var userStatusMsg message.NotifyUserStatusMes
+	userStatusMsg.UserId = userId
+	userStatusMsg.Status = message.UserOnline
+	data, err := json.Marshal(userStatusMsg)
+	if err != nil {
+		fmt.Println("json.Marshal", err)
+		return err
+	}
+	resMsg.Data = string(data)
+	data, err = json.Marshal(resMsg)
+	if err != nil {
+		fmt.Println("json.Marshal", err)
+		return err
+
+	}
+	tf.WritePkg(data)
 	return nil
 }

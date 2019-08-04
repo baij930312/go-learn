@@ -57,6 +57,19 @@ func (this *UserProcess) Login(account int, password string) error {
 	}
 	fmt.Println(loginRes)
 	if loginRes.Code == 200 {
+		var onlineUsers []int
+		err = json.Unmarshal([]byte(loginRes.Data), &onlineUsers)
+		if err != nil {
+			fmt.Println("json.Unmarshal", err)
+			return err
+		}
+		for _, v := range onlineUsers {
+			user := &message.User{
+				UserId: v,
+				Status: message.UserOffLine,
+			}
+			OnlineUsers[v] = user
+		}
 		go serverProcessSms(conn)
 		for {
 			ShowMenu()

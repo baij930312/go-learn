@@ -1,10 +1,12 @@
 package process
 
 import (
+	"encoding/json"
 	"fmt"
 	"net"
 
 	"go_code/learn/file/chat/client/utils"
+	"go_code/learn/file/chat/common/message"
 )
 
 func ShowMenu() {
@@ -19,7 +21,7 @@ func ShowMenu() {
 	fmt.Scanf("%d\n", &key)
 	switch key {
 	case 1:
-		fmt.Println("显示在线用户列表")
+		OutPutOnlineUsers()
 
 	case 2:
 		fmt.Println("发送信息")
@@ -44,5 +46,18 @@ func serverProcessSms(conn net.Conn) {
 			fmt.Println("read error ")
 		}
 		fmt.Println(msg)
+
+		switch msg.Type {
+		case message.NotifyUserStatusMesType:
+			var notifMes message.NotifyUserStatusMes
+			err = json.Unmarshal([]byte(msg.Data), &notifMes)
+			if err != nil {
+				fmt.Println(" json.Unmarshal")
+			}
+			updateUserStatus(&notifMes)
+
+		default:
+			fmt.Println("收到消息")
+		}
 	}
 }
