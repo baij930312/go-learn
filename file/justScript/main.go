@@ -40,11 +40,12 @@ func runScript(path string, config Config) {
 		fmt.Println("cd err path:", path, cdErr)
 	}
 	for _, script := range config.Scripts {
-		_, execErr := execShell(script)
+		result, execErr := execShell(script)
 		if execErr != nil {
 			fmt.Printf("end script err ,script:%s,  path:%s,   err:%v", script, path, execErr)
 			return
 		}
+		fmt.Println("result : ", result)
 		fmt.Println("end script success : ", script)
 	}
 	fmt.Println("complete update for path:", path)
@@ -63,7 +64,7 @@ func main() {
 
 func execShell(s string) (string, error) {
 	//函数返回一个*Cmd，用于使用给出的参数执行name指定的程序
-	cmd := exec.Command("/bin/bash", "-c", s)
+	cmd := exec.Command("cmd", "/C", s)
 
 	//读取io.Writer类型的cmd.Stdout，再通过bytes.Buffer(缓冲byte类型的缓冲器)将byte类型转化为string类型(out.String():这是bytes类型提供的接口)
 	var out bytes.Buffer
