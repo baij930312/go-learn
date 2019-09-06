@@ -3,8 +3,8 @@ package main
 import "fmt"
 
 func main() {
-	a := []int{1, 3, 4, 2, 8, 9, 123, 3}
-	b := []int{1, 2, 6, 123, 13, 7, 3}
+	a := []int{'a', 'd', '4', '2', '8', '9', '3'}
+	b := []int{'a', '3', 'd', 'f', 'g', 'h', '3'}
 	fmt.Println(run(a, b))
 }
 
